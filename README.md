@@ -1,27 +1,67 @@
 # AngularCLICodacy
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/5a5fd0e6e6d245cbb14546ffbbc65745)](https://www.codacy.com/app/SpiralOutDotEu/AngularCLI-Codacy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=SpiralOutDotEu/AngularCLI-Codacy&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/5a5fd0e6e6d245cbb14546ffbbc65745)](https://www.codacy.com/app/SpiralOutDotEu/AngularCLI-Codacy?utm_source=github.com&utm_medium=referral&utm_content=SpiralOutDotEu/AngularCLI-Codacy&utm_campaign=Badge_Coverage)
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.7.3.
 
-## Development server
+## Instructions 
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+Create a new AngularCLI project:
+```
+ng new AngularCLI-Codacy
+```
+Install Codacy-Coverage as dev dependency:
+``` 
+npm i codacy-coverage --save-dev
+```
+Add script to `package.json` to send `lcov.info` to `codacy-coverage`:
+```
+"codacy": "cat ./coverage/lcov.info | ./node_modules/.bin/codacy-coverage -p ."
+```
 
-## Code scaffolding
+Create `.travis.yml` and add instructions to run the tests with code coverage and then run the `codacy` script:
+```
+sudo: required
+language: node_js
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+node_js:
+   - node
 
-## Build
+addons:
+apt:
+  sources:
+    - google-chrome
+  packages:
+    - google-chrome-stable
+    - google-chrome-beta
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+before_install:
+  - export CHROME_BIN=chromium-browser
+  - export DISPLAY=:99.0
 
-## Running unit tests
+before_script:
+   - "sh -e /etc/init.d/xvfb start"
+   - npm install -g --silent @angular/cli
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+script:
+   - ng test --single-run --code-coverage
 
-## Running end-to-end tests
+after_success:
+   - npm run codacy
+```
+Go to [Codacy](https://app.codacy.com) and enable your project.
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
+* From the project's settings, copy the badge [![Codacy Badge](https://api.codacy.com/project/badge/Grade/5a5fd0e6e6d245cbb14546ffbbc65745)](https://www.codacy.com/app/SpiralOutDotEu/AngularCLI-Codacy?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=SpiralOutDotEu/AngularCLI-Codacy&amp;utm_campaign=Badge_Grade)
+ and place it into your `README.md`.
 
-## Further help
+* From your project's dashboard, press on setup coverage and copy the generated token.
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+Go to [TravisCI](https://travis-ci.org/profile) and enable your project.
+
+* Into Travis environment Variables, add a new environment variable:
+  * `CODACY_PROJECT_TOKEN` = `%Project_Token%` *(replacing %Project_Token% with your token from Codacy)*
+
+Now you are ready and with each push to the repository TravisCI will run the test and send the report to Codacy.
+At the same time Codacy will check the quality of your Code.
+
+After the first test coverage report is sent to Codacy, you can go to Codacy's project settings and get your test coverage Badge.[![Codacy Badge](https://api.codacy.com/project/badge/Coverage/5a5fd0e6e6d245cbb14546ffbbc65745)](https://www.codacy.com/app/SpiralOutDotEu/AngularCLI-Codacy?utm_source=github.com&utm_medium=referral&utm_content=SpiralOutDotEu/AngularCLI-Codacy&utm_campaign=Badge_Coverage)
+
